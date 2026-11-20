@@ -18,6 +18,12 @@ class axi4_byte_hist;
   bit [255:0]  v[$];
 endclass
 
+// A completed write with its bytes indexed by address (fast overlap lookups).
+class axi4_wr_rec;
+  time        t_addr, t_done;
+  bit [7:0]   b[bit [63:0]];
+endclass
+
 class axi4_mem_scoreboard extends uvm_component;
   `uvm_component_utils(axi4_mem_scoreboard)
 
@@ -28,7 +34,7 @@ class axi4_mem_scoreboard extends uvm_component;
   bit           enabled = 1;
   axi4_byte_hist hist[bit [63:0]];
   axi4_item     inflight_wr[$];     // address seen, response not yet
-  axi4_item     done_wr[$];         // completed writes still relevant to pending checks
+  axi4_wr_rec   done_wr[$];         // completed writes still relevant to pending checks
   axi4_item     pend_rd[$];         // completed reads waiting for overlapping writes
   int unsigned  n_wr, n_rd, n_err, n_bytes, n_ambiguous;
   time          horizon;            // no open or future check looks earlier than this
@@ -114,16 +120,17 @@ class axi4_mem_scoreboard extends uvm_component;
 
   function void commit(axi4_item w);
     byte_t bs[$];
+    axi4_wr_rec rec = new();
+    axi4_wr_rec during[$];
+    rec.t_addr = w.t_addr; rec.t_done = w.t_done;
     burst_bytes(w, bs);
+    // Writes that completed while w was in flight may be ordered either side of it.
+    foreach (done_wr[k]) if (done_wr[k].t_done >= w.t_addr) during.push_back(done_wr[k]);
     foreach (bs[i]) begin
       bit [255:0] s = '0;
       s[bs[i].d] = 1;
-      // Writes that completed while w was in flight may be ordered either side of it.
-      foreach (done_wr[k]) if (done_wr[k].t_done >= w.t_addr) begin
-        byte_t ob[$];
-        burst_bytes(done_wr[k], ob);
-        foreach (ob[j]) if (ob[j].a == bs[i].a) s[ob[j].d] = 1;
-      end
+      rec.b[bs[i].a] = bs[i].d;
+      foreach (during[k]) if (during[k].b.exists(bs[i].a)) s[during[k].b[bs[i].a]] = 1;
       if ($countones(s) > 1) n_ambiguous++;
       if (!hist.exists(bs[i].a)) hist[bs[i].a] = new();
       // Keep only the last entry before the horizon (the value then) and everything after.
@@ -133,7 +140,7 @@ class axi4_mem_scoreboard extends uvm_component;
       hist[bs[i].a].t.push_back(w.t_done);
       hist[bs[i].a].v.push_back(s);
     end
-    done_wr.push_back(w);
+    done_wr.push_back(rec);
   endfunction
 
   function void check_reads();
@@ -150,14 +157,12 @@ class axi4_mem_scoreboard extends uvm_component;
 
   function void check_read(axi4_item r);
     byte_t bs[$];
+    axi4_wr_rec ovl[$];
     burst_bytes(r, bs);
+    foreach (done_wr[k]) if (done_wr[k].t_addr <= r.t_done && done_wr[k].t_done >= r.t_addr) ovl.push_back(done_wr[k]);
     foreach (bs[i]) begin
       bit [255:0] s = sets_during(bs[i].a, r.t_addr, r.t_done);
-      foreach (done_wr[k]) if (done_wr[k].t_addr <= r.t_done && done_wr[k].t_done >= r.t_addr) begin
-        byte_t ob[$];
-        burst_bytes(done_wr[k], ob);
-        foreach (ob[j]) if (ob[j].a == bs[i].a) s[ob[j].d] = 1;
-      end
+      foreach (ovl[k]) if (ovl[k].b.exists(bs[i].a)) s[ovl[k].b[bs[i].a]] = 1;
       n_bytes++;
       if (!s[bs[i].d])
         `uvm_error("MEM_SB", $sformatf("read byte %0h = %02h, not a possible value (%0d candidates): %s",

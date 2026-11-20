@@ -1,0 +1,7 @@
+# confluence_xbar block regression (M2)
+- {bench: xbar, test: xbar_smoke_test,        seeds: [1]}
+- {bench: xbar, test: xbar_random_test,       seeds: [1, 2, 3, 4, 5, 6]}
+- {bench: xbar, test: xbar_hotspot_test,      seeds: [1, 2]}
+- {bench: xbar, test: xbar_same_id_test,      seeds: [1, 2]}
+- {bench: xbar, test: xbar_error_test,        seeds: [1, 2]}
+- {bench: xbar, test: xbar_backpressure_test, seeds: [1, 2]}
