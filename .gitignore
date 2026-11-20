@@ -1,0 +1,6 @@
+.tools/
+build/
+reports/
+__pycache__/
+*.vcd
+*.fst
