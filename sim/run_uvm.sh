@@ -2,7 +2,8 @@
 # Build (once, cached) and run one SV-UVM bench under Verilator 5.054.
 #   sim/run_uvm.sh BENCH TEST [SEED] [+plusargs...]
 # BENCH names sim/flists/BENCH.f; its last file is the top module (same name as the file).
-# Env: VERILATOR, UVM_HOME (default .tools/uvm-verilator/src), REBUILD=1, COVERAGE=1, DEFINES.
+# Env: VERILATOR, UVM_HOME (default .tools/uvm-verilator/src), REBUILD=1, COVERAGE=1, DEFINES,
+#      BUILD_TAG (separate build dir, e.g. per mutant).
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd); cd "$ROOT"
 BENCH=$1; TEST=$2; SEED=${3:-1}; shift $(( $# < 3 ? $# : 3 ))
@@ -10,7 +11,7 @@ VERILATOR=${VERILATOR:-$(command -v verilator || echo /opt/verilator-5.054/bin/v
 UVM_HOME=${UVM_HOME:-$ROOT/.tools/uvm-verilator/src}
 FL=sim/flists/$BENCH.f
 TOP=$(basename "$(grep -v '^\s*[#+-]' "$FL" | grep -v '^\s*$' | tail -1)" .sv)
-OBJ=build/$BENCH${COVERAGE:+_cov}
+OBJ=build/$BENCH${COVERAGE:+_cov}${BUILD_TAG:+_$BUILD_TAG}
 INC=$(grep -v '^\s*[#+-]' "$FL" | grep -v '^\s*$' | xargs -n1 dirname | sort -u | sed 's/^/-I/' | tr '\n' ' ')
 if [ ! -x "$OBJ/V$TOP" ] || [ -n "${REBUILD:-}" ] || [ -n "$(find $(grep -v '^\s*[#+-]' "$FL" | grep -v '^\s*$' | xargs -n1 dirname | sort -u) -newer "$OBJ/V$TOP" -name '*.sv*' 2>/dev/null | head -1)" ]; then
   mkdir -p "$OBJ"

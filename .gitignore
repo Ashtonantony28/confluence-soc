@@ -4,3 +4,6 @@ reports/
 __pycache__/
 *.vcd
 *.fst
+formal/xbar/xbar/
+formal/xbar/xbar_*/
+formal/xbar/xbar_rtl.v

@@ -1,0 +1,29 @@
+# SymbiYosys proof of confluence_xbar properties (formal/xbar/xbar_formal.sv).
+# The RTL is SystemVerilog; formal/run_formal.sh converts it with sv2v first.
+[tasks]
+bmc
+prove
+pdr
+
+[options]
+bmc: mode bmc
+bmc: depth 12
+prove: mode prove
+prove: depth 12
+pdr: mode prove
+
+[engines]
+bmc: smtbmc yices
+prove: smtbmc yices
+pdr: abc pdr
+
+[script]
+read_verilog -formal xbar_rtl.v
+read_verilog -formal -sv xbar_formal.sv
+prep -top xbar_formal
+setundef -undriven -anyseq
+setundef -zero
+
+[files]
+xbar_rtl.v
+xbar_formal.sv

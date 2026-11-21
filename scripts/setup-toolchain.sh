@@ -24,5 +24,17 @@ if [ ! -d "$ROOT/.tools/uvm-verilator" ]; then
 fi
 git -C "$ROOT/.tools/uvm-verilator" checkout -q "$UVM_SHA"
 pip install -q -r "$ROOT/requirements.txt"
+# Formal (M2+): sv2v (SV -> Verilog for yosys 0.33), yices (SMT engine), sby pinned to the
+# yosys-0.33 tag (sby master needs a newer yosys).
+pip install -q yices-solver
+if ! command -v sv2v >/dev/null; then
+  tmp=$(mktemp -d)
+  curl -sSL -o "$tmp/sv2v.zip" https://github.com/zachjs/sv2v/releases/download/v0.0.13/sv2v-Linux.zip
+  (cd "$tmp" && unzip -q sv2v.zip && $SUDO install -m755 sv2v-Linux/sv2v /usr/local/bin/sv2v)
+fi
+if ! command -v sby >/dev/null; then
+  tmp=$(mktemp -d); git clone -q -b yosys-0.33 --depth 1 https://github.com/YosysHQ/sby "$tmp/sby"
+  (cd "$tmp/sby" && $SUDO make -s install PREFIX=/usr/local)
+fi
 git -C "$ROOT" submodule update --init --recursive -q
 echo "toolchain ready: $("$VL_PREFIX/bin/verilator" --version)"

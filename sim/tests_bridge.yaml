@@ -1,0 +1,5 @@
+# AXI4 -> AXI4-Lite and AXI4-Lite -> APB bridges (M2)
+- {bench: bridge, test: bridge_smoke_test,  seeds: [1]}
+- {bench: bridge, test: bridge_random_test, seeds: [1, 2, 3, 4]}
+- {bench: bridge, test: bridge_error_test,  seeds: [1, 2]}
+- {bench: bridge, test: bridge_word_err_test, seeds: [1]}
