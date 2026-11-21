@@ -4,7 +4,8 @@ J ?= 4
 RTL_LIB := rtl/lib/cf_fifo.sv rtl/lib/cf_rr_arb.sv
 
 .PHONY: lint smoke-build vip-test test-xbar test-bridge formal-xbar formal-xbar-bmc \
-        regs regs-check regs-html test-ral nanoxl-traces test-nanoxl test-xbar-50 regress clean
+        regs regs-check regs-html test-ral nanoxl-traces test-nanoxl spikemesh-traces test-spikemesh mutate-router \
+        test-xbar-50 regress clean
 GEN_BLOCKS := cf_sys_ctrl cf_irq_ctrl cf_timer cf_dma_csr cf_spikemesh_ctl cf_mailbox
 
 # Verilator -Wall on every new RTL block (upstream IPs are linted in their own repos).
@@ -53,7 +54,16 @@ nanoxl-traces:
 test-nanoxl: nanoxl-traces
 	python3 sim/regress.py sim/tests_nanoxl.yaml -j $(J)
 
-regress: lint regs-check vip-test test-xbar test-bridge test-ral test-nanoxl
+# M5: SpikeMesh chip env against golden traces recorded from SpikeMesh's host API + golden chip.
+spikemesh-traces:
+	sim/gen_spikemesh_traces.sh
+test-spikemesh: spikemesh-traces
+	python3 sim/regress.py sim/tests_spikemesh.yaml -j $(J)
+# router env vs mutated copies of SpikeMesh's router (submodule untouched); every mutant must die
+mutate-router:
+	python3 scripts/mutate_router.py
+
+regress: lint regs-check vip-test test-xbar test-bridge test-ral test-nanoxl test-spikemesh
 
 clean:
 	rm -rf build reports formal/xbar/xbar_bmc formal/xbar/xbar_prove formal/xbar/xbar_pdr

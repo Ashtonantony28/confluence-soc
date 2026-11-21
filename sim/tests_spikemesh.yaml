@@ -1,0 +1,18 @@
+# SpikeMesh chip env (M5). Needs the golden traces: sim/gen_spikemesh_traces.sh (make test-spikemesh does it).
+# Trained 256-256-10 net on 32 emulated N-MNIST samples + 3 random nets, raw host flits bit-exact
+# against SpikeMesh golden; random backpressure; plus the corruption self-check.
+- {bench: spikemesh, test: spikemesh_fast_test,         seeds: [1],       args: "+TRACE=build/traces/spikemesh/trained_0_8.trace"}
+- {bench: spikemesh, test: spikemesh_fast_test,         seeds: [1],       args: "+TRACE=build/traces/spikemesh/trained_8_8.trace"}
+- {bench: spikemesh, test: spikemesh_fast_test,         seeds: [1],       args: "+TRACE=build/traces/spikemesh/trained_16_8.trace"}
+- {bench: spikemesh, test: spikemesh_fast_test,         seeds: [1],       args: "+TRACE=build/traces/spikemesh/trained_24_8.trace"}
+- {bench: spikemesh, test: spikemesh_backpressure_test, seeds: [1, 2, 3], args: "+TRACE=build/traces/spikemesh/trained_0_8.trace"}
+- {bench: spikemesh, test: spikemesh_backpressure_test, seeds: [1, 2, 3], args: "+TRACE=build/traces/spikemesh/rand_1.trace"}
+- {bench: spikemesh, test: spikemesh_backpressure_test, seeds: [4, 5, 6], args: "+TRACE=build/traces/spikemesh/rand_2.trace"}
+- {bench: spikemesh, test: spikemesh_backpressure_test, seeds: [7, 8, 9], args: "+TRACE=build/traces/spikemesh/rand_3.trace"}
+- {bench: spikemesh, test: spikemesh_corrupt_test,      seeds: [1],       args: "+TRACE=build/traces/spikemesh/trained_0_8.trace"}
+# SpikeMesh router-level env: centre (1,1) and corner (0,0) routers of a 3x3 mesh at once;
+# routing / ordering / no-loss scoreboard against an independent SPEC §4 model.
+- {bench: router, test: router_random_test,  seeds: [1, 2, 3, 4, 5, 6]}
+- {bench: router, test: router_storm_test,   seeds: [1, 2, 3, 4]}
+- {bench: router, test: router_hotspot_test, seeds: [1, 2, 3]}
+- {bench: router, test: router_drop_test,    seeds: [1, 2]}

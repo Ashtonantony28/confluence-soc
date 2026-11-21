@@ -33,3 +33,24 @@ MLACC-UVM ships these mutants in `mlacc_csr.sv`; here they are run against `make
 fixes a field's compare flag at configure time. The register env now re-enables comparison on
 W1C fields because their set sources are idle in that bench. `ADDR_ALIAS` needed the new
 unmapped-address test (every hole of every 4 KiB window).
+
+## SpikeMesh router (M5): mutated copies vs the router env
+
+`make mutate-router` (`scripts/mutate_router.py`) writes each mutant as a copy of
+`third_party/spikemesh/rtl/noc/router.sv` under `build/mutants/router/` (the submodule is never
+edited) and runs the named test against it.
+
+| Mutant | Bug | Killed by | Status |
+|---|---|---|---|
+| `YX_ROUTE` | dimension order swapped (Y before X) | router_random_test (scoreboard: misrouted) | killed |
+| `HOST_EAST` | host-bound flits leave on E instead of W | router_random_test (misrouted) | killed |
+| `CREDIT_INIT` | output credits start one above the neighbour FIFO depth | router_storm_test (CREDIT-R01) | killed |
+| `NO_CREDIT_RET` | credit return for input W lost | router_storm_test (stimulus watchdog) | killed |
+| `WRONG_HEAD` | link register takes input 0's flit, not the granted input's | router_random_test (misrouted / never sent) | killed |
+| `LOCAL_NO_HOLD` | local output valid drops without ready | router_random_test (AXIS-R01, loss) | killed |
+| `DROP_UNCOUNTED` | dropped flits not counted | router_drop_test (drop_cnt check) | killed |
+| `NO_DROP` | out-of-mesh flits routed east instead of dropped | router_drop_test (never sent) | killed |
+
+`NO_CREDIT_RET` first survived and exposed a testbench bug (CF-TB-001 in docs/BUGS.md): the
+starved sender was never waited for, so the test ended early and passed. The env now waits for
+every sender, checks every input's sent count, and runs a stimulus watchdog.

@@ -61,3 +61,10 @@
 - {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_VALID_IN_RESET +EXPECT_RULE=AXIS-R03"}
 - {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_KEEP_HOLE +EXPECT_RULE=AXIS-R04"}
 - {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_KEEP_SHORT_MID +EXPECT_RULE=AXIS-R04"}
+# Credit-link VIP (M5): loopback, slow receiver, and every checker rule proven to fire.
+- {bench: credit_selftest, test: credit_smoke_test,        seeds: [1]}
+- {bench: credit_selftest, test: credit_random_test,       seeds: [1, 2, 3]}
+- {bench: credit_selftest, test: credit_backpressure_test, seeds: [1, 2]}
+- {bench: credit_selftest, test: credit_violation_test, seeds: [1], args: "+INJECT=CREDIT_INJ_NO_CREDIT +EXPECT_RULE=CREDIT-R01"}
+- {bench: credit_selftest, test: credit_violation_test, seeds: [1], args: "+INJECT=CREDIT_INJ_EXTRA_CREDIT +EXPECT_RULE=CREDIT-R02"}
+- {bench: credit_selftest, test: credit_violation_test, seeds: [1], args: "+INJECT=CREDIT_INJ_VALID_IN_RESET +EXPECT_RULE=CREDIT-R03"}
