@@ -1,0 +1,11 @@
+# NanoXL block env (M4). Needs the golden traces: sim/gen_nanoxl_traces.sh (make test-nanoxl does it).
+# 30 seeds over W8A8 and W4A8, bit-exact against NanoXL golden; plus the corruption self-check.
+- {bench: nanoxl, test: nanoxl_random_test,   seeds: [1, 2, 3, 4, 5, 6], args: "+TRACE=build/traces/nanoxl/w8a8_l1.trace"}
+- {bench: nanoxl, test: nanoxl_random_test,   seeds: [1, 2, 3, 4, 5, 6], args: "+TRACE=build/traces/nanoxl/w4a8_l1.trace"}
+- {bench: nanoxl, test: nanoxl_random_test,   seeds: [1, 2, 3, 4, 5, 6], args: "+TRACE=build/traces/nanoxl/w8a8_l2_wrap.trace"}
+- {bench: nanoxl, test: nanoxl_random_test,   seeds: [1, 2, 3, 4, 5, 6], args: "+TRACE=build/traces/nanoxl/w4a8_l2_wrap.trace"}
+- {bench: nanoxl, test: nanoxl_random_test,   seeds: [1, 2],             args: "+TRACE=build/traces/nanoxl/w8a8_full.trace"}
+- {bench: nanoxl, test: nanoxl_random_test,   seeds: [1, 2],             args: "+TRACE=build/traces/nanoxl/w4a8_full.trace"}
+- {bench: nanoxl, test: nanoxl_slow_mem_test, seeds: [1],                args: "+TRACE=build/traces/nanoxl/w8a8_full.trace"}
+- {bench: nanoxl, test: nanoxl_slow_mem_test, seeds: [1],                args: "+TRACE=build/traces/nanoxl/w4a8_full.trace"}
+- {bench: nanoxl, test: nanoxl_corrupt_test,  seeds: [1],                args: "+TRACE=build/traces/nanoxl/w8a8_l1.trace"}

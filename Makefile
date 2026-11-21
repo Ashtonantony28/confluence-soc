@@ -4,7 +4,7 @@ J ?= 4
 RTL_LIB := rtl/lib/cf_fifo.sv rtl/lib/cf_rr_arb.sv
 
 .PHONY: lint smoke-build vip-test test-xbar test-bridge formal-xbar formal-xbar-bmc \
-        regs regs-check regs-html test-ral regress clean
+        regs regs-check regs-html test-ral nanoxl-traces test-nanoxl test-xbar-50 regress clean
 GEN_BLOCKS := cf_sys_ctrl cf_irq_ctrl cf_timer cf_dma_csr cf_spikemesh_ctl cf_mailbox
 
 # Verilator -Wall on every new RTL block (upstream IPs are linted in their own repos).
@@ -47,7 +47,13 @@ regs-html:
 test-ral:
 	python3 sim/regress.py sim/tests_regs.yaml -j $(J)
 
-regress: lint regs-check vip-test test-xbar test-bridge test-ral
+# M4: NanoXL block env against golden traces recorded from NanoXL's driver + funcsim.
+nanoxl-traces:
+	sim/gen_nanoxl_traces.sh
+test-nanoxl: nanoxl-traces
+	python3 sim/regress.py sim/tests_nanoxl.yaml -j $(J)
+
+regress: lint regs-check vip-test test-xbar test-bridge test-ral test-nanoxl
 
 clean:
 	rm -rf build reports formal/xbar/xbar_bmc formal/xbar/xbar_prove formal/xbar/xbar_pdr
