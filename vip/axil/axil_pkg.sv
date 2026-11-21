@@ -17,4 +17,5 @@ package axil_pkg;
   `include "axil_coverage.svh"
   `include "axil_agent.svh"
   `include "axil_seq_lib.svh"
+  `include "axil_reg_adapter.svh"
 endpackage

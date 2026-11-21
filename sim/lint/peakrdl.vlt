@@ -1,0 +1,9 @@
+`verilator_config
+// Waivers for PeakRDL-regblock output only (ADR 0004: no hand edits of regs/gen).
+// MULTIDRIVEN: Verilator flags struct members (field_combo / field_storage) written by separate
+//   processes; each member has exactly one driver, so this is a known false positive.
+// GENUNNAMED / UNUSED*: generator style (unnamed generate, unused cpuif inputs and params).
+lint_off -rule MULTIDRIVEN  -file "*regs/gen/rtl/*"
+lint_off -rule GENUNNAMED   -file "*regs/gen/rtl/*"
+lint_off -rule UNUSEDSIGNAL -file "*regs/gen/rtl/*"
+lint_off -rule UNUSEDPARAM  -file "*regs/gen/rtl/*"

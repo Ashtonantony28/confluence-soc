@@ -1,0 +1,26 @@
+// mlacc_csr: AUDIT description of MLACC's existing APB block (third_party/mlacc-uvm,
+// rtl/mlacc_csr.sv + mlacc_pkg.sv). RAL from this file runs against the real mlacc_top (ADR 0004).
+addrmap mlacc_csr {
+    name = "MLACC CSRs";
+    default regwidth = 32;
+    default hw = w;
+
+    reg { field { sw = r; hw = na; } id[32] = 0x4D4C4143; } ID @ 0x000;
+    reg { field { sw = r; hw = na; } value[32] = 0x00010000; } VERSION @ 0x004;
+    reg {
+        field { sw = rw; hw = r; } en[1] = 0;
+        field { sw = rw; hw = r; } irq_en_done[1] = 0;
+        field { sw = rw; hw = r; } irq_en_sat[1] = 0;
+        field { sw = rw; hw = r; } irq_en_err[1] = 0;
+    } CTRL @ 0x008;
+    reg { field { sw = r; } busy[1]; field { sw = r; } fifo_level[7:4]; } STATUS @ 0x00C;
+    reg { field { sw = rw; onwrite = woclr; hw = r; hwset; } sat[1] = 0; } MLSTAT @ 0x010;
+    reg {
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } done[1] = 0;
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } sat[1] = 0;
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } err[1] = 0;
+    } IRQ_STATUS @ 0x014;
+    reg { field { sw = r; } count[32]; } CMD_COUNT @ 0x018;
+    reg { field { sw = r; } count[32]; } RSP_COUNT @ 0x01C;
+    reg { field { sw = rw; hw = r; } value[32] = 0; } SCRATCH @ 0x020;
+};

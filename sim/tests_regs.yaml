@@ -1,0 +1,5 @@
+# M3 register flow: RAL from regs/*.rdl against generated CSRs and the real NanoXL / MLACC CSRs
+- {bench: regs, test: regs_hw_reset_test, seeds: [1]}
+- {bench: regs, test: regs_bit_bash_test, seeds: [1]}
+- {bench: regs, test: regs_rw_test, seeds: [1, 2, 3]}
+- {bench: regs, test: regs_unmapped_test, seeds: [1]}

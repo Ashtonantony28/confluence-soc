@@ -1,0 +1,42 @@
+// nanoxl_csr: AUDIT description of NanoXL's existing csr_axil (third_party/nanoxl-accelerator,
+// docs/control.md sec. 5). Not generated into RTL: the RAL built from it is run against the real
+// csr_axil to prove the documented map and the RTL agree (ADR 0004).
+addrmap nanoxl_csr {
+    name = "NanoXL control plane";
+    default regwidth = 32;
+    default hw = w;
+
+    reg { field { sw = r; hw = na; } id[32] = 0x4E584C43; } ID @ 0x000;
+    reg { field { sw = r; hw = na; } value[32] = 0x00010000; } VERSION @ 0x004;
+    reg {
+        field { sw = rw; hw = r; } step_mode[1] = 0;
+        field { sw = w; hw = r; desc = "write 1: soft reset; reads soft-reset busy"; } soft_reset[1] = 0;
+    } CTRL @ 0x008;
+    reg {
+        field { sw = r; } halted[1]; field { sw = r; } queues_idle[1]; field { sw = r; } ring_empty[1];
+        field { sw = r; } busy[1]; field { sw = r; } q_idle[6:4]; field { sw = r; } eng_busy[10:8];
+        field { sw = r; } cfg_ok[13:13]; field { sw = r; } soft_busy[1]; field { sw = r; } q_overflow[1];
+    } STATUS @ 0x00C;
+    reg { field { sw = r; } code[4]; } ERR_CODE @ 0x010;
+    reg { field { sw = r; } index[24]; } ERR_INDEX @ 0x014;
+    reg { field { sw = r; } value[32]; } ERR_W[4] @ 0x018 += 4;
+    reg { field { sw = rw; hw = r; } addr[31:4] = 0; } RING_BASE @ 0x030;
+    reg { field { sw = rw; hw = r; } words[24] = 0; } RING_SIZE @ 0x034;
+    reg { field { sw = r; } index[24]; } RING_HEAD @ 0x038;
+    reg { field { sw = rw; hw = rw; } tail[24] = 0; } DOORBELL @ 0x03C;
+    reg { field { sw = rw; hw = r; } en[3] = 0; } IRQ_EN @ 0x040;
+    reg { field { sw = rw; onwrite = woclr; hw = r; hwset; } status[3] = 0; } IRQ_STATUS @ 0x044;
+    reg { field { sw = r; } code[16]; } IRQ_CODE @ 0x048;
+    reg { field { sw = r; } count[32]; } END_COUNT @ 0x04C;
+    reg { field { sw = w; hw = r; } step[1] = 0; } DBG_STEP @ 0x050;
+    reg { field { sw = r; } index[24]; } DBG_LAST @ 0x054;
+    reg { field { sw = rw; hw = r; } sel[5] = 0; } SEM_SEL @ 0x058;
+    reg { field { sw = r; } value[8]; } SEM_VAL @ 0x05C;
+    reg { field { sw = w; hw = r; } clr_perf[1] = 0; field { sw = w; hw = r; } clr_sat[1] = 0; } PERF_CTRL @ 0x060;
+    reg { field { sw = r; } value[32]; } PERF_CYCLES @ 0x064;
+    reg { field { sw = r; } value[32]; } PERF_BUSY[3] @ 0x068 += 4;
+    reg { field { sw = r; } value[32]; } PERF_RETIRED @ 0x074;
+    reg { field { sw = r; } value[32]; } PERF_BYTES_LO @ 0x078;
+    reg { field { sw = r; } value[32]; } PERF_BYTES_HI @ 0x07C;
+    reg { field { sw = r; } value[32]; } SAT[5] @ 0x080 += 4;
+};

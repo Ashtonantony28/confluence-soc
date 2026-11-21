@@ -1,0 +1,28 @@
+// cf_dma_csr: sys_dma control (M7). Three channels: 0 memory<->memory, 1 SpikeMesh flits
+// (AXI-Stream), 2 MLACC command/response streams.
+regfile cf_dma_chan {
+    reg { name = "Source address";
+        field { sw = rw; hw = r; } addr[32] = 0;
+    } SRC @ 0x0;
+    reg { name = "Destination address";
+        field { sw = rw; hw = r; } addr[32] = 0;
+    } DST @ 0x4;
+    reg { name = "Length in bytes";
+        field { sw = rw; hw = r; } bytes[24] = 0;
+    } LEN @ 0x8;
+    reg { name = "Control";
+        field { sw = rw; hw = r; singlepulse; } start[1] = 0;
+        field { sw = rw; hw = r; } irq_en[1] = 0;
+        field { sw = rw; hw = r; } mode[2] = 0;
+    } CTRL @ 0xC;
+    reg { name = "Status";
+        field { sw = r; hw = w; } busy[1];
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } done[1] = 0;
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } err[1] = 0;
+    } STATUS @ 0x10;
+};
+addrmap cf_dma_csr {
+    name = "System DMA";
+    default regwidth = 32;
+    cf_dma_chan CHAN[3] @ 0x000 += 0x20;
+};

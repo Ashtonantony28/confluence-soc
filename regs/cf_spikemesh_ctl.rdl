@@ -1,0 +1,28 @@
+// cf_spikemesh_ctl: control/status wrapper for spikemesh_top (step protocol, errors, irq).
+addrmap cf_spikemesh_ctl {
+    name = "SpikeMesh control";
+    default regwidth = 32;
+
+    reg { name = "Control";
+        field { sw = rw; hw = r; singlepulse; } step[1] = 0;
+        field { sw = rw; hw = r; } soft_rst[1] = 0;
+    } CTRL @ 0x000;
+    reg { name = "Status";
+        field { sw = r; hw = w; } busy[1];
+        field { sw = r; hw = w; } drained[1];
+        field { sw = r; hw = w; } err[1];
+        field { sw = r; hw = w; } t_parity[1];
+        field { sw = r; hw = w; } drop_cnt[8];
+    } STATUS @ 0x004;
+    reg { name = "Interrupt enable";
+        field { sw = rw; hw = r; } step_done[1] = 0;
+        field { sw = rw; hw = r; } err[1] = 0;
+    } IRQ_EN @ 0x008;
+    reg { name = "Interrupt status";
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } step_done[1] = 0;
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } err[1] = 0;
+    } IRQ_STATUS @ 0x00C;
+    reg { name = "Steps completed";
+        field { sw = r; hw = r; counter; incrwidth = 1; } value[32] = 0;
+    } STEP_COUNT @ 0x010;
+};

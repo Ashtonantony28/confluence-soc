@@ -1,0 +1,6 @@
+# confluence_xbar 50-seed regression (M2 exit criterion; nightly once CI exists)
+- {bench: xbar, test: xbar_random_test,       seeds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]}
+- {bench: xbar, test: xbar_hotspot_test,      seeds: [1, 2, 3, 4, 5]}
+- {bench: xbar, test: xbar_same_id_test,      seeds: [1, 2, 3, 4, 5]}
+- {bench: xbar, test: xbar_error_test,        seeds: [1, 2, 3, 4, 5]}
+- {bench: xbar, test: xbar_backpressure_test, seeds: [1, 2, 3, 4, 5]}

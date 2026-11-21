@@ -1,0 +1,35 @@
+// cf_sys_ctrl: SoC identity, scratch, block resets and the simulation exit register.
+// Map: confluence_soc.rdl (S3, AXI4-Lite). Generated RTL: regs/gen/rtl/cf_sys_ctrl.sv.
+addrmap cf_sys_ctrl {
+    name = "System control";
+    default regwidth = 32;
+    default sw = rw;
+    default hw = r;
+
+    reg { name = "Chip ID";
+        field { sw = r; hw = na; } id[32] = 0x434E464C; // "CNFL"
+    } ID @ 0x000;
+    reg { name = "Version";
+        field { sw = r; hw = na; } minor[16] = 0;
+        field { sw = r; hw = na; } major[16] = 1;
+    } VERSION @ 0x004;
+    reg { name = "Block resets";
+        desc = "1 holds the block in reset. All blocks run after power-on reset.";
+        field {} nanoxl[1] = 0;
+        field {} spikemesh[1] = 0;
+        field {} mlacc[1] = 0;
+        field {} dma[1] = 0;
+    } RESET_CTRL @ 0x008;
+    reg { name = "Boot straps";
+        field { sw = r; hw = w; } boot_sel[2];
+        field { sw = r; hw = w; } sim[1];
+    } BOOT_CFG @ 0x00C;
+    reg { name = "Simulation exit";
+        desc = "Firmware writes {code, done=1}; the testbench ends the test. code 0 = pass.";
+        field { swmod; } done[1] = 0;
+        field {} code[31] = 0;
+    } SIM_EXIT @ 0x010;
+    reg { name = "Scratch";
+        field {} value[32] = 0;
+    } SCRATCH[4] @ 0x020 += 4;
+};
