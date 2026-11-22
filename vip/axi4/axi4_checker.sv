@@ -115,13 +115,81 @@ module axi4_checker #(
   // Blocking updates on purpose: the bookkeeping is a checker model, not hardware.
   // Locals are declared here and assigned below: an initialiser on a declaration inside a
   // static always block would run only once.
-  int unsigned exp_n, got_n, rn, rl;
+  // R18 bookkeeping: address/size/burst of each AW, consumed by its W burst. The strobes of a W
+  // burst that leads its AW are kept and checked when the AW arrives.
+  typedef struct { longint unsigned addr; int unsigned size, len; logic [1:0] burst; } aw_t;
+  aw_t         aw_w_q[$];
+  int          w_lane_burst;       // index into aw_w_q of the W burst in progress, -1 = unknown
+  int unsigned w_lane_beat;
+  logic [DW/8-1:0] led_strb[$];   // strobes of W bursts that completed before their AW, flat
+  int unsigned     led_len[$];    // beats of each such burst
+  int unsigned     led_cur;       // beats of the led W burst in progress
+
+  // byte lanes beat n of a burst may use (IHI 0022 A3.4.3: narrow and unaligned transfers)
+  function automatic logic [DW/8-1:0] lanes(aw_t a, int unsigned n);
+    longint unsigned nb = 1 << a.size, ba, lo, aligned, wsz;
+    if (a.burst == BURST_FIXED) ba = a.addr;
+    else if (a.burst == BURST_WRAP) begin
+      wsz = nb * a.len;
+      lo  = (a.addr / wsz) * wsz;
+      ba  = lo + ((a.addr - lo + n * nb) % wsz);
+    end else ba = (n == 0) ? a.addr : ((a.addr / nb) * nb + n * nb);
+    aligned = (ba / nb) * nb;
+    lanes = '0;
+    for (longint unsigned b = ba; b < aligned + nb; b++) lanes[b % (DW / 8)] = 1'b1;
+  endfunction
+
+  int unsigned exp_n, got_n, rn, rl, nl;
+  logic [DW/8-1:0] ok_lanes, st;
+  aw_t         a;
   always @(posedge aclk) begin
     if (!aresetn) begin
+      aw_w_q.delete(); w_lane_burst = 0; w_lane_beat = 0; led_strb.delete(); led_len.delete(); led_cur = 0;
       aw_len_q.delete(); w_cnt_q.delete(); aw_id_q.delete(); w_beats = 0;
       for (int i = 0; i < NID; i++) begin wr_done[i] = 0; rd_len_q[i].delete(); r_beats[i] = 0; end
     end else begin
-      if (awvalid && awready) begin aw_len_q.push_back(int'(awlen) + 1); aw_id_q.push_back(awid); end
+      if (awvalid && awready) begin
+        a.addr = longint'(awaddr); a.size = awsize; a.len = int'(awlen) + 1; a.burst = awburst;
+        aw_len_q.push_back(int'(awlen) + 1); aw_id_q.push_back(awid);
+        if (led_len.size() > 0) begin    // its data already went by
+          nl = led_len.pop_front();
+          for (int unsigned k = 0; k < nl; k++) begin
+            st = led_strb.pop_front();
+            ok_lanes = lanes(a, k);
+            if ((st & ~ok_lanes) != '0)
+              fail("AXI4-R18", $sformatf("beat %0d of write to %0h (size %0d): wstrb %0h outside active lanes %0h",
+                   k, a.addr, 1 << a.size, st, ok_lanes));
+          end
+        end else if (w_lane_burst != 0 && w_lane_beat > 0) begin
+          // the AW of the led W burst in progress: check its beats so far, then the rest live
+          for (int unsigned k = 0; k < led_cur; k++) begin
+            st = led_strb.pop_front();
+            ok_lanes = lanes(a, k);
+            if ((st & ~ok_lanes) != '0)
+              fail("AXI4-R18", $sformatf("beat %0d of write to %0h (size %0d): wstrb %0h outside active lanes %0h",
+                   k, a.addr, 1 << a.size, st, ok_lanes));
+          end
+          led_cur = 0;
+          aw_w_q.push_back(a);
+          w_lane_burst = 0;
+        end else aw_w_q.push_back(a);
+      end
+      // R18: WSTRB only on the byte lanes the beat's address and size make active.
+      if (wvalid && wready) begin
+        if (w_lane_beat == 0) w_lane_burst = (aw_w_q.size() > 0) ? 0 : -1;
+        if (w_lane_burst != 0) begin led_strb.push_back(wstrb); led_cur++; end
+        else begin
+          ok_lanes = lanes(aw_w_q[0], w_lane_beat);
+          if ((wstrb & ~ok_lanes) != '0)
+            fail("AXI4-R18", $sformatf("beat %0d of write to %0h (size %0d): wstrb %0h outside active lanes %0h",
+                 w_lane_beat, aw_w_q[0].addr, 1 << aw_w_q[0].size, wstrb, ok_lanes));
+        end
+        if (wlast) begin
+          if (w_lane_burst == 0) void'(aw_w_q.pop_front());
+          else begin led_len.push_back(led_cur); led_cur = 0; end
+          w_lane_beat = 0;
+        end else w_lane_beat++;
+      end
       w_beats_prev = w_beats;
       if (wvalid && wready) begin
         if (wlast) begin w_cnt_q.push_back(w_beats + 1); w_beats = 0; end

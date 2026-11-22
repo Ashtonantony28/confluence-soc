@@ -54,3 +54,22 @@ edited) and runs the named test against it.
 `NO_CREDIT_RET` first survived and exposed a testbench bug (CF-TB-001 in docs/BUGS.md): the
 starved sender was never waited for, so the test ended early and passed. The env now waits for
 every sender, checks every input's sent count, and runs a stimulus watchdog.
+
+## Vortex-V AXI bridge (M6)
+
+`scripts/mutate_cpu_bridge.py` compiles each mutant in with `+define+MUTANT_<NAME>` (own build
+directory) and runs a five-run kill list (random streams, byte stores and loads, slow memory).
+
+| Mutant | Bug | Killed by | Status |
+|---|---|---|---|
+| `VXB_WSTRB_FULL` | every byte lane strobed on a narrow store | AXI4-R18 (new checker rule) | killed |
+| `VXB_NO_LANE_SHIFT` | load data not shifted down from its byte lane | lockstep (wrong load value) | killed |
+| `VXB_POSTED_WRITE` | core steps before the write response | timeout (the bridge hangs: B never taken) | killed |
+| `VXB_DOUBLE_STEP` | every 16th step gives the core two edges | lockstep | killed |
+| `VXB_STALE_REQ` | data request taken from the previous core cycle | lockstep | killed |
+| `VXB_FETCH1_STALE` | second fetch port returns the first port's word (two-wide core) | lockstep | killed |
+
+`VXB_WSTRB_FULL` first survived: the VIP slave, like any compliant slave, ignores strobes outside
+a narrow transfer's lanes, so memory never changed. Strobes outside the active lanes are still a
+protocol violation (IHI 0022 A3.4.3), so the AXI4 checker gained rule AXI4-R18, with its own
+injection self-test (`AXI4_INJ_WSTRB_OUTSIDE`).

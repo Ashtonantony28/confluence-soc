@@ -17,6 +17,7 @@ typedef enum int {
   AXI4_INJ_WRAP_BAD_LEN,      // WRAP with len = 2
   AXI4_INJ_CROSS_4K,          // INCR burst crossing a 4 KiB boundary
   AXI4_INJ_SIZE_TOO_BIG,      // awsize wider than the data bus
+  AXI4_INJ_WSTRB_OUTSIDE,     // narrow write beat with every strobe set (lanes outside the transfer)
   // slave side
   AXI4_INJ_RLAST_EARLY,       // rlast one beat early
   AXI4_INJ_R_UNKNOWN_ID,      // read data for an ID with nothing outstanding

@@ -13,6 +13,7 @@
 - {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_R_VALID_DROP +EXPECT_RULE=AXI4-R05"}
 - {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_BURST_RSVD +EXPECT_RULE=AXI4-R07"}
 - {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_SIZE_TOO_BIG +EXPECT_RULE=AXI4-R08"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_WSTRB_OUTSIDE +EXPECT_RULE=AXI4-R18"}
 - {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_WRAP_BAD_LEN +EXPECT_RULE=AXI4-R09"}
 - {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_CROSS_4K +EXPECT_RULE=AXI4-R12"}
 - {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_WLAST_EARLY +EXPECT_RULE=AXI4-R13"}

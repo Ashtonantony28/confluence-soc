@@ -28,6 +28,7 @@
 | AXI4-R15 | B only for a write whose AW and last W have been seen |
 | AXI4-R16 | R only for an ID with an outstanding read |
 | AXI4-R17 | RLAST exactly on the last beat of the oldest read of that ID |
+| AXI4-R18 | WSTRB only on the byte lanes the beat's address and size make active (narrow / unaligned) |
 
 ## Self-test (`vip/axi4/test`)
 

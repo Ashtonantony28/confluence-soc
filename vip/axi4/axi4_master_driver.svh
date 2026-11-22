@@ -126,7 +126,8 @@ class axi4_master_driver #(int AW = 32, int DW = 128, int IDW = 4) extends uvm_d
           nb++;                                  // one extra beat carries the late wlast
         end
         vif.wdata <= DW'(n < t.data.size() ? t.data[n] : t.data[t.data.size() - 1]);
-        vif.wstrb <= SW'(n < t.strb.size() ? t.strb[n] : '0);
+        if (t.size < $clog2(SW) && inject_now(AXI4_INJ_WSTRB_OUTSIDE)) vif.wstrb <= '1;
+        else vif.wstrb <= SW'(n < t.strb.size() ? t.strb[n] : '0);
         vif.wlast <= last; vif.wvalid <= 1;
         @(posedge vif.aclk);
         while (!vif.wready) begin

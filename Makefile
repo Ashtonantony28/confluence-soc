@@ -5,6 +5,7 @@ RTL_LIB := rtl/lib/cf_fifo.sv rtl/lib/cf_rr_arb.sv
 
 .PHONY: lint smoke-build vip-test test-xbar test-bridge formal-xbar formal-xbar-bmc \
         regs regs-check regs-html test-ral nanoxl-traces test-nanoxl spikemesh-traces test-spikemesh mutate-router \
+        cpu-traces test-cpu-axi \
         test-xbar-50 regress clean
 GEN_BLOCKS := cf_sys_ctrl cf_irq_ctrl cf_timer cf_dma_csr cf_spikemesh_ctl cf_mailbox
 
@@ -13,6 +14,8 @@ lint:
 	$(VERILATOR) --lint-only -Wall -f rtl/xbar/files.f --top-module confluence_xbar
 	$(VERILATOR) --lint-only -Wall $(RTL_LIB) rtl/bridge/axi2axil.sv --top-module axi2axil
 	$(VERILATOR) --lint-only -Wall $(RTL_LIB) rtl/bridge/axil2apb.sv --top-module axil2apb
+	$(VERILATOR) --lint-only -Wall rtl/bridge/vortex_axi_bridge.sv --top-module vortex_axi_bridge
+	$(VERILATOR) --lint-only -Wall rtl/lib/cf_clk_gate.sv --top-module cf_clk_gate
 	for b in $(GEN_BLOCKS); do $(VERILATOR) --lint-only -Wall sim/lint/peakrdl.vlt \
 	  regs/gen/rtl/$${b}_pkg.sv regs/gen/rtl/$$b.sv --top-module $$b || exit 1; done
 	@echo "lint clean"
@@ -63,7 +66,13 @@ test-spikemesh: spikemesh-traces
 mutate-router:
 	python3 scripts/mutate_router.py
 
-regress: lint regs-check vip-test test-xbar test-bridge test-ral test-nanoxl test-spikemesh
+# M6: Vortex-V on AXI through vortex_axi_bridge, lockstep with Vortex-V's ISS (ADR 0006).
+cpu-traces:
+	sim/gen_cpu_traces.sh
+test-cpu-axi: cpu-traces
+	python3 sim/regress.py sim/tests_cpu_axi.yaml -j $(J)
+
+regress: lint regs-check vip-test test-xbar test-bridge test-ral test-nanoxl test-spikemesh test-cpu-axi
 
 clean:
 	rm -rf build reports formal/xbar/xbar_bmc formal/xbar/xbar_prove formal/xbar/xbar_pdr
