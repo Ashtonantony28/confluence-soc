@@ -110,5 +110,14 @@ module xbar_tb_top;
     .s_arvalid(s_arvalid), .s_arready(s_arready),
     .s_rid(s_rid), .s_rdata(s_rdata), .s_rresp(s_rresp), .s_rlast(s_rlast), .s_rvalid(s_rvalid), .s_rready(s_rready));
 
+`ifdef WAVES
+  // Port-level waveform for docs/media (scripts/media.py): build with
+  // DEFINES="+define+WAVES --trace-fst" BUILD_TAG=waves. Depth 1 = the packed port views above.
+  initial begin
+    $dumpfile("build/xbar_waves.fst");
+    $dumpvars(1, xbar_tb_top);
+  end
+`endif
+
   initial run_test();
 endmodule
