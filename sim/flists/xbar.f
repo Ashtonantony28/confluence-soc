@@ -1,0 +1,10 @@
+rtl/lib/cf_fifo.sv
+rtl/lib/cf_rr_arb.sv
+rtl/xbar/axi4_default_slave.sv
+rtl/xbar/confluence_xbar.sv
+vip/common/vip_common_pkg.sv
+vip/axi4/axi4_if.sv
+vip/axi4/axi4_pkg.sv
+vip/axi4/axi4_checker.sv
+tb/xbar/xbar_env_pkg.sv
+tb/xbar/xbar_tb_top.sv

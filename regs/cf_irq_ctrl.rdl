@@ -1,0 +1,29 @@
+// cf_irq_ctrl: PLIC-lite. 16 level sources, per-source priority, one target (Vortex-V MEIP).
+// Claim/complete logic lives in rtl/periph/cf_irq_ctrl.sv (M7) around this register block.
+addrmap cf_irq_ctrl {
+    name = "Interrupt controller";
+    default regwidth = 32;
+
+    reg { name = "Pending";
+        field { sw = r; hw = w; } src[16];
+    } PENDING @ 0x000;
+    reg { name = "Enable";
+        field { sw = rw; hw = r; } src[16] = 0;
+    } ENABLE @ 0x004;
+    reg { name = "Threshold";
+        desc = "Only sources with priority > threshold interrupt the target.";
+        field { sw = rw; hw = r; } value[3] = 0;
+    } THRESHOLD @ 0x008;
+    reg { name = "Claim";
+        desc = "Read: id of the highest-priority pending enabled source (0 = none); marks it in service.";
+        field { sw = r; hw = w; swacc; } id[5];
+    } CLAIM @ 0x00C;
+    reg { name = "Complete";
+        desc = "Write the claimed id to end its service.";
+        field { sw = w; hw = r; swmod; } id[5] = 0;
+    } COMPLETE @ 0x010;
+    reg { name = "Source priority";
+        desc = "0 never interrupts.";
+        field { sw = rw; hw = r; } value[3] = 0;
+    } PRIORITY[16] @ 0x040 += 4;
+};

@@ -1,0 +1,12 @@
+[submodule "third_party/vortex-v"]
+	path = third_party/vortex-v
+	url = https://github.com/Ashtonantony28/vortex-v
+[submodule "third_party/nanoxl-accelerator"]
+	path = third_party/nanoxl-accelerator
+	url = https://github.com/Ashtonantony28/nanoxl-accelerator
+[submodule "third_party/spikemesh"]
+	path = third_party/spikemesh
+	url = https://github.com/Ashtonantony28/SpikeMesh
+[submodule "third_party/mlacc-uvm"]
+	path = third_party/mlacc-uvm
+	url = https://github.com/Ashtonantony28/mlacc-uvm

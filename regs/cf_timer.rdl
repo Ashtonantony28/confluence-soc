@@ -1,0 +1,29 @@
+// cf_timer: 64-bit machine timer (mtime / mtimecmp) with a prescaler and an interrupt.
+addrmap cf_timer {
+    name = "Machine timer";
+    default regwidth = 32;
+
+    reg { name = "Control";
+        field { sw = rw; hw = r; } enable[1] = 0;
+        field { sw = rw; hw = r; } irq_en[1] = 0;
+    } CTRL @ 0x000;
+    reg { name = "Prescaler";
+        desc = "mtime advances once every value+1 clock cycles.";
+        field { sw = rw; hw = r; } value[16] = 0;
+    } PRESCALE @ 0x004;
+    reg { name = "Status";
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } fired[1] = 0;
+    } STATUS @ 0x008;
+    reg { name = "mtime low";
+        field { sw = rw; hw = rw; we; } value[32] = 0;
+    } MTIME_LO @ 0x010;
+    reg { name = "mtime high";
+        field { sw = rw; hw = rw; we; } value[32] = 0;
+    } MTIME_HI @ 0x014;
+    reg { name = "mtimecmp low";
+        field { sw = rw; hw = r; } value[32] = 0xFFFFFFFF;
+    } MTIMECMP_LO @ 0x018;
+    reg { name = "mtimecmp high";
+        field { sw = rw; hw = r; } value[32] = 0xFFFFFFFF;
+    } MTIMECMP_HI @ 0x01C;
+};

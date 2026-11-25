@@ -1,0 +1,23 @@
+# VIP self-test regression (M1). Each entry: bench, test, seeds, optional plusargs.
+- {bench: axi4_selftest, test: axi4_smoke_test,   seeds: [1]}
+- {bench: axi4_selftest, test: axi4_inorder_test, seeds: [1, 2]}
+- {bench: axi4_selftest, test: axi4_random_test,  seeds: [1, 2, 3, 4, 5]}
+- {bench: axi4_selftest, test: axi4_error_test,   seeds: [1, 2]}
+- {bench: axi4_selftest, test: axi4_sb_sanity_test, seeds: [1]}
+# Every injected protocol violation must be caught by the named checker rule.
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_AW_VALID_DROP +EXPECT_RULE=AXI4-R01"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_AW_PAYLOAD_CHANGE +EXPECT_RULE=AXI4-R01"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_W_VALID_DROP +EXPECT_RULE=AXI4-R02"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_B_VALID_DROP +EXPECT_RULE=AXI4-R03"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_AR_VALID_DROP +EXPECT_RULE=AXI4-R04"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_R_VALID_DROP +EXPECT_RULE=AXI4-R05"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_BURST_RSVD +EXPECT_RULE=AXI4-R07"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_SIZE_TOO_BIG +EXPECT_RULE=AXI4-R08"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_WSTRB_OUTSIDE +EXPECT_RULE=AXI4-R18"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_WRAP_BAD_LEN +EXPECT_RULE=AXI4-R09"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_CROSS_4K +EXPECT_RULE=AXI4-R12"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_WLAST_EARLY +EXPECT_RULE=AXI4-R13"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_WLAST_MISSING +EXPECT_RULE=AXI4-R13"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_B_UNKNOWN_ID +EXPECT_RULE=AXI4-R15"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_R_UNKNOWN_ID +EXPECT_RULE=AXI4-R16"}
+- {bench: axi4_selftest, test: axi4_violation_test, seeds: [1], args: "+INJECT=AXI4_INJ_RLAST_EARLY +EXPECT_RULE=AXI4-R17"}

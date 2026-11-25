@@ -1,0 +1,25 @@
+// confluence_soc: the SoC CSR address map (single source for RAL, C headers and docs).
+// Memories (boot ROM 0x0000_0000, SRAM 0x1000_0000, DRAM 0x8000_0000) are not registers and
+// live in docs/ADDRESS_MAP.md. S3 = AXI4->AXI4-Lite bridge, S4 = AXI4->APB bridge.
+`include "cf_sys_ctrl.rdl"
+`include "cf_irq_ctrl.rdl"
+`include "cf_timer.rdl"
+`include "cf_mailbox.rdl"
+`include "cf_dma_csr.rdl"
+`include "cf_spikemesh_ctl.rdl"
+`include "nanoxl_csr.rdl"
+`include "mlacc_csr.rdl"
+
+addrmap confluence_soc {
+    name = "Confluence SoC";
+    // S3: AXI4-Lite peripherals, 4 KiB each
+    external nanoxl_csr       nanoxl       @ 0x40000000;
+    external cf_spikemesh_ctl spikemesh    @ 0x40001000;
+    external cf_sys_ctrl      sys_ctrl     @ 0x40002000;
+    external cf_irq_ctrl      irq_ctrl     @ 0x40003000;
+    external cf_timer         timer        @ 0x40004000;
+    external cf_dma_csr       dma          @ 0x40005000;
+    // S4: APB peripherals, 4 KiB each (UART at 0x50001000 has no CSR model yet)
+    external mlacc_csr        mlacc        @ 0x50000000;
+    external cf_mailbox       mailbox      @ 0x50002000;
+};

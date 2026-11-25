@@ -1,0 +1,22 @@
+// Vortex-V CPU on AXI (M6), two-wide core (WIDTH=2) with the second bridge fetch port
++define+CPU_WIDTH2
+third_party/vortex-v/rtl/core/vortex_pkg.sv
+third_party/vortex-v/rtl/core/vortex_alu.sv
+third_party/vortex-v/rtl/core/vortex_regfile.sv
+third_party/vortex-v/rtl/core/vortex_decoder.sv
+third_party/vortex-v/rtl/core/vortex_muldiv.sv
+third_party/vortex-v/rtl/core/vortex_xmlacc.sv
+third_party/vortex-v/rtl/core/vortex_branch_cmp.sv
+third_party/vortex-v/rtl/core/vortex_load_ext.sv
+third_party/vortex-v/rtl/core/vortex_lsq_fwd.sv
+third_party/vortex-v/rtl/core/vortex_core.sv
+third_party/vortex-v/rtl/core/vortex_ooo_core.sv
+rtl/lib/cf_clk_gate.sv
+rtl/bridge/vortex_axi_bridge.sv
+vip/common/vip_common_pkg.sv
+vip/axi4/axi4_if.sv
+vip/axi4/axi4_pkg.sv
+vip/axi4/axi4_checker.sv
+tb/cpu_axi/cpu_retire_if.sv
+tb/cpu_axi/cpu_axi_env_pkg.sv
+tb/cpu_axi/cpu_axi_tb_top.sv

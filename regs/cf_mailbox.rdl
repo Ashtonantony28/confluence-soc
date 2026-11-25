@@ -1,0 +1,21 @@
+// cf_mailbox: firmware <-> testbench handshake (PLAN sec. 5, fw_agent). APB.
+// Firmware fills ARG0-3 then writes CMD; the write pulses to the testbench, which answers in
+// RESP and sets STATUS.resp_valid; firmware clears it with W1C.
+addrmap cf_mailbox {
+    name = "Testbench mailbox";
+    default regwidth = 32;
+
+    reg { name = "Command";
+        field { sw = rw; hw = r; swmod; } code[16] = 0;
+        field { sw = rw; hw = r; } seq[16] = 0;
+    } CMD @ 0x000;
+    reg { name = "Argument";
+        field { sw = rw; hw = r; } value[32] = 0;
+    } ARG[4] @ 0x010 += 4;
+    reg { name = "Response";
+        field { sw = r; hw = w; } value[32];
+    } RESP @ 0x020;
+    reg { name = "Status";
+        field { sw = rw; onwrite = woclr; hw = r; hwset; } resp_valid[1] = 0;
+    } STATUS @ 0x024;
+};

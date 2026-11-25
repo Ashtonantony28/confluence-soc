@@ -1,0 +1,70 @@
+# Lite-protocol VIP self-test regression (M1): AXI4-Lite, APB4, AXI4-Stream.
+# Each entry: bench, test, seeds, optional plusargs. Run: python3 sim/regress.py sim/tests_vip_lite.yaml -j 4
+# ---- AXI4-Lite, 32-bit data
+- {bench: axil_selftest, test: axil_smoke_test,     seeds: [1]}
+- {bench: axil_selftest, test: axil_serial_test,    seeds: [1]}
+- {bench: axil_selftest, test: axil_random_test,    seeds: [1, 2, 3, 4, 5]}
+- {bench: axil_selftest, test: axil_error_test,     seeds: [1, 2]}
+- {bench: axil_selftest, test: axil_sb_sanity_test, seeds: [1]}
+# ---- AXI4-Lite, 64-bit data (same sources, +define+AXIL_SELFTEST_DW=64)
+- {bench: axil64_selftest, test: axil_smoke_test,     seeds: [1]}
+- {bench: axil64_selftest, test: axil_random_test,    seeds: [1, 2, 3]}
+- {bench: axil64_selftest, test: axil_error_test,     seeds: [1]}
+- {bench: axil64_selftest, test: axil_sb_sanity_test, seeds: [1]}
+# Every injected AXI4-Lite violation must be caught by the named checker rule.
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_AW_VALID_DROP +EXPECT_RULE=AXIL-R01"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_AW_PAYLOAD_CHANGE +EXPECT_RULE=AXIL-R01"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_W_VALID_DROP +EXPECT_RULE=AXIL-R02"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_W_PAYLOAD_CHANGE +EXPECT_RULE=AXIL-R02"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_B_VALID_DROP +EXPECT_RULE=AXIL-R03"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_B_PAYLOAD_CHANGE +EXPECT_RULE=AXIL-R03"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_AR_VALID_DROP +EXPECT_RULE=AXIL-R04"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_AR_PAYLOAD_CHANGE +EXPECT_RULE=AXIL-R04"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_R_VALID_DROP +EXPECT_RULE=AXIL-R05"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_R_PAYLOAD_CHANGE +EXPECT_RULE=AXIL-R05"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_VALID_IN_RESET +EXPECT_RULE=AXIL-R06"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_B_UNSOLICITED +EXPECT_RULE=AXIL-R07"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_R_UNSOLICITED +EXPECT_RULE=AXIL-R08"}
+- {bench: axil_selftest, test: axil_violation_test, seeds: [1], args: "+INJECT=AXIL_INJ_EXOKAY +EXPECT_RULE=AXIL-R09"}
+# ---- APB4
+- {bench: apb_selftest, test: apb_smoke_test,     seeds: [1]}
+- {bench: apb_selftest, test: apb_random_test,    seeds: [1, 2, 3, 4, 5]}
+- {bench: apb_selftest, test: apb_error_test,     seeds: [1, 2]}
+- {bench: apb_selftest, test: apb_sb_sanity_test, seeds: [1]}
+- {bench: apb_selftest, test: apb_reg_test,       seeds: [1]}
+# Every injected APB4 violation must be caught by the named checker rule.
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_ENABLE_NO_SETUP +EXPECT_RULE=APB-R01"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_SETUP_NO_ACCESS +EXPECT_RULE=APB-R02"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_ADDR_CHANGE_WAIT +EXPECT_RULE=APB-R03"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_SEL_DROP_WAIT +EXPECT_RULE=APB-R03"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_SETUP_CHANGE +EXPECT_RULE=APB-R04"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_ENABLE_STUCK +EXPECT_RULE=APB-R05"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_ENABLE_NO_SEL +EXPECT_RULE=APB-R06"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_READ_STRB +EXPECT_RULE=APB-R07"}
+- {bench: apb_selftest, test: apb_violation_test, seeds: [1], args: "+INJECT=APB_INJ_SEL_IN_RESET +EXPECT_RULE=APB-R08"}
+# ---- AXI4-Stream, 64-bit data with 4-bit TID, 2-bit TDEST, 4-bit TUSER
+- {bench: axis_selftest, test: axis_smoke_test,        seeds: [1]}
+- {bench: axis_selftest, test: axis_random_test,       seeds: [1, 2, 3, 4, 5]}
+- {bench: axis_selftest, test: axis_sparse_test,       seeds: [1, 2], args: "+AXIS_SPARSE"}
+- {bench: axis_selftest, test: axis_backpressure_test, seeds: [1, 2]}
+- {bench: axis_selftest, test: axis_sb_sanity_test,    seeds: [1]}
+# ---- AXI4-Stream, 8-bit data, no TID / TDEST / TUSER (same sources, +define+AXIS_SELFTEST_MIN)
+- {bench: axis_min_selftest, test: axis_smoke_test,     seeds: [1]}
+- {bench: axis_min_selftest, test: axis_random_test,    seeds: [1, 2]}
+- {bench: axis_min_selftest, test: axis_sparse_test,    seeds: [1], args: "+AXIS_SPARSE"}
+- {bench: axis_min_selftest, test: axis_sb_sanity_test, seeds: [1]}
+# Every injected AXI4-Stream violation must be caught by the named checker rule.
+- {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_VALID_DROP +EXPECT_RULE=AXIS-R01"}
+- {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_DATA_CHANGE +EXPECT_RULE=AXIS-R02"}
+- {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_LAST_CHANGE +EXPECT_RULE=AXIS-R02"}
+- {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_ID_CHANGE +EXPECT_RULE=AXIS-R02"}
+- {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_VALID_IN_RESET +EXPECT_RULE=AXIS-R03"}
+- {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_KEEP_HOLE +EXPECT_RULE=AXIS-R04"}
+- {bench: axis_selftest, test: axis_violation_test, seeds: [1], args: "+INJECT=AXIS_INJ_KEEP_SHORT_MID +EXPECT_RULE=AXIS-R04"}
+# Credit-link VIP (M5): loopback, slow receiver, and every checker rule proven to fire.
+- {bench: credit_selftest, test: credit_smoke_test,        seeds: [1]}
+- {bench: credit_selftest, test: credit_random_test,       seeds: [1, 2, 3]}
+- {bench: credit_selftest, test: credit_backpressure_test, seeds: [1, 2]}
+- {bench: credit_selftest, test: credit_violation_test, seeds: [1], args: "+INJECT=CREDIT_INJ_NO_CREDIT +EXPECT_RULE=CREDIT-R01"}
+- {bench: credit_selftest, test: credit_violation_test, seeds: [1], args: "+INJECT=CREDIT_INJ_EXTRA_CREDIT +EXPECT_RULE=CREDIT-R02"}
+- {bench: credit_selftest, test: credit_violation_test, seeds: [1], args: "+INJECT=CREDIT_INJ_VALID_IN_RESET +EXPECT_RULE=CREDIT-R03"}
